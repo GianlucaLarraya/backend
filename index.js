@@ -29,7 +29,6 @@ let persons = [
 
 app.use(express.json())
 app.use(express.static('dist'))
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
 app.use(cors())
 
 
@@ -106,12 +105,34 @@ app.get('/', (request, response) => {
     })
   })
 
-  app.delete('/api/persons/:id', (request, response) => {
+  app.delete('/api/persons/:id', morgan(':method :url'), (request, response) => {
     const id = Number(request.params.id)
     persons = persons.filter(person => person.id !== id)
       
     response.status(204).end()
       })
+
+  app.put('/api/persons/:id', morgan(':method :url'), (request, response) => {
+    const body = request.body
+    const id = Number(request.params.id)
+    personsex = persons.filter(person => person.id !== id)
+
+    const person = {
+      id: generateId(),
+      name: body.name,
+      number: body.number,
+    }
+
+    response.json(person)
+
+    persons = personsex.concat(person)
+
+
+
+    response.status(204).end()
+
+  })
+
 
   
   const PORT = process.env.PORT || 3001
